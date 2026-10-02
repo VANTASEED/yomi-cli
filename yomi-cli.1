@@ -1,0 +1,132 @@
+.TH "YOMI-CLI" "1" "September 2026" "yomi-cli" "User Commands"
+.SH NAME
+yomi-cli \- search and watch anime from the command line
+.SH SYNOPSIS
+.B yomi-cli
+[\fIOPTIONS\fR] [\fIQUERY\fR]
+.SH DESCRIPTION
+.B yomi-cli
+searches anime through AniList metadata, resolves playback through Yomi.to and MegaPlay, and launches a local media player.
+.PP
+The command supports subbed and dubbed playback, quality selection, persistent subtitle preferences, episode history, downloads, and player integrations.
+.SH OPTIONS
+.TP
+\fB\-c, --continue\fR
+Continue watching from history.
+.TP
+\fB\-d, --download\fR
+Download the episode instead of playing it.
+.TP
+\fB\-D, --delete\fR
+Delete episode history.
+.TP
+\fB\-e, --episode, -r, --range\fR \fI<episode>\fR
+Specify an episode or range. Use 0 for the first available episode and -1 for the last.
+.TP
+\fB\-l, --logview\fR
+Show playback logs.
+.TP
+\fB\-q, --quality\fR \fI<best|worst|360|480|720|1080>\fR
+Select video quality. The default is best.
+.TP
+\fB\-s, --syncplay\fR
+Use Syncplay to watch with friends.
+.TP
+\fB\-S, --select-nth\fR \fI<index>\fR
+Select the nth search or history entry.
+.TP
+\fB\-v, --vlc\fR
+Use VLC as the media player.
+.TP
+\fB\-V, --version\fR
+Show the script version.
+.TP
+\fB\-h, --help\fR
+Show usage and options.
+.TP
+\fB\-N, --nextep-countdown\fR
+Display a countdown to the next episode.
+.TP
+\fB\--dub\fR
+Play the dubbed version. Subbed playback is the default.
+.TP
+\fB\--rofi\fR
+Use rofi instead of fzf for interactive menus.
+.TP
+\fB\--dmenu\fR
+Use dmenu instead of fzf for interactive menus.
+.TP
+\fB\--skip\fR
+Use ani-skip to skip the intro when using mpv.
+.TP
+\fB\--no-detach\fR
+Do not detach the player. Useful for terminal playback with mpv.
+.TP
+\fB\--exit-after-play\fR
+Return after the player exits and use its exit code. Useful for non-interactive runs.
+.SH INTERACTIVE MENU
+After playback, the episode menu provides next, replay, previous, episode selection, quality selection, subtitle selection, and quit.
+.PP
+Navigation actions are queued until the current player exits. Subtitle selection offers available tracks and an off option. Subtitles start enabled and prefer English; the selected state is saved in the history directory.
+.SH ENVIRONMENT
+.TP
+\fBYOMI_CLI_MODE\fR
+Playback mode: sub or dub. Default is sub.
+.TP
+\fBYOMI_CLI_QUALITY\fR
+Playback quality: best, worst, or a listed height. Default is best.
+.TP
+\fBYOMI_CLI_PLAYER\fR
+Player command or special player name. Default is platform dependent.
+.TP
+\fBYOMI_CLI_PLAYER_FLAGS\fR
+Additional player flags. Default is empty.
+.TP
+\fBYOMI_CLI_MENU\fR
+Menu frontend: fzf, rofi, dmenu, or another compatible command. Default is fzf.
+.TP
+\fBYOMI_CLI_MENU_FLAGS\fR
+Additional menu flags. Default is empty.
+.TP
+\fBYOMI_CLI_HIST_DIR\fR
+Directory for history and subtitle settings. Default is $XDG_STATE_HOME/yomi-cli or $HOME/.local/state/yomi-cli.
+.TP
+\fBYOMI_CLI_DEFAULT_SOURCE\fR
+Default source: search or history. Default is search.
+.TP
+\fBYOMI_CLI_SUBTITLES\fR
+Whether subtitles start enabled. Set to 0 or 1. Default is 1.
+.TP
+\fBYOMI_CLI_SUBTITLE_LANGUAGE\fR
+Initial preferred subtitle label. Default is English.
+.TP
+\fBYOMI_CLI_RELAY_SCRIPT\fR
+Path to yomi-relay.py. By default it is located beside yomi-cli.
+.TP
+\fBYOMI_CLI_DOWNLOAD_DIR\fR
+Directory for downloads. Default is the current directory.
+.TP
+\fBYOMI_CLI_LOG\fR
+Playback logging toggle. Set to 0 or 1. Default is 1.
+.TP
+\fBYOMI_CLI_SKIP_INTRO\fR
+Whether to use ani-skip. Set to 0 or 1. Default is 0.
+.TP
+\fBYOMI_CLI_NO_DETACH\fR
+Whether the player remains attached. Default is 0.
+.TP
+\fBYOMI_CLI_EXIT_AFTER_PLAY\fR
+Whether to return after playback. Default is 0.
+.SH FILES
+.TP
+\fB$XDG_STATE_HOME/yomi-cli/yomi-hsts\fR (or $HOME/.local/state/yomi-cli/yomi-hsts)
+Episode history.
+.TP
+\fB$XDG_STATE_HOME/yomi-cli/settings\fR (or $HOME/.local/state/yomi-cli/settings)
+Subtitle enabled state and preferred language.
+.SH DEPENDENCIES
+The normal path requires a POSIX shell, curl, sed, grep, jq, fzf or another menu frontend, Python 3, OpenSSL, and a compatible media player. Downloads additionally require yt-dlp or ffmpeg.
+.SH ATTRIBUTION
+Yomi CLI is derived from ani-cli and retains the original GPL-3.0 licensing. See ATTRIBUTION.md and LICENSE.
+.SH COPYRIGHT
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3 or later.
