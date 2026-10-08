@@ -72,6 +72,33 @@ class RelayHandler(http.server.BaseHTTPRequestHandler):
             output.append(self.local_url(urljoin(url, stripped)))
         return ("\n".join(output) + "\n").encode()
 
+    # Some releases put a blank line inside a cue (for example a multi-line
+    # text-message sign). WebVTT ends a cue at a blank line, so parsers treat
+    # the rest as garbage and stop reading the file. Fold such orphan blocks
+    # back into the preceding cue.
+    @staticmethod
+    def sanitize_webvtt(body):
+        text = body.decode("utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
+        blocks = text.strip("\n").split("\n\n")
+        output = []
+        in_cue = False
+        for block in blocks:
+            if not block.strip():
+                continue
+            lines = block.strip("\n").split("\n")
+            first = lines[0].strip()
+            is_cue = "-->" in lines[0] or (len(lines) > 1 and "-->" in lines[1])
+            is_meta = first.startswith(("WEBVTT", "NOTE", "STYLE", "REGION"))
+            if is_cue:
+                output.append(lines)
+                in_cue = True
+            elif is_meta or not in_cue:
+                output.append(lines)
+                in_cue = False
+            else:
+                output[-1].extend(lines)
+        return ("\n\n".join("\n".join(lines) for lines in output) + "\n\n").encode()
+
     @staticmethod
     def strip_wrapper(body):
         for offset in range(0, min(512, len(body) - 564)):
@@ -197,7 +224,9 @@ class RelayHandler(http.server.BaseHTTPRequestHandler):
         content_type = "text/vtt; charset=utf-8" if is_subtitle else "application/vnd.apple.mpegurl" if is_playlist else "video/mp2t"
         if is_playlist:
             body = self.rewrite_playlist(url, body)
-        elif not is_subtitle:
+        elif is_subtitle:
+            body = self.sanitize_webvtt(body)
+        else:
             body = self.strip_wrapper(body)
             body = self.normalize_transport_stream(body)
 
