@@ -184,6 +184,10 @@ yomi-cli --download -e 2 "cyberpunk edgerunners"
 
 Run `yomi-cli --help` for the complete option list. The interactive episode menu provides `next`, `replay`, `previous`, episode selection, quality selection, subtitle selection, and quit. A selected navigation action waits for the current player to close before launching the next action.
 
+## Metadata and playback
+
+Search and episode metadata are retrieved from AniList. Yomi.to and MegaPlay resolve the actual HLS video and subtitle streams. If AniList does not publish a total episode count for an airing series, `yomi-cli` derives the released episode count from the next scheduled episode so valid current episodes remain selectable.
+
 ## Subtitles
 
 Subtitles start enabled and prefer the `English` track. After an episode starts, choose `subtitles` from the episode menu to select another available track or choose `off`.

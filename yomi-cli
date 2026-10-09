@@ -247,17 +247,25 @@ yomi_desc() {
     unset seasons seasons_option
 }
 
-# get the episodes list from AniList's count. format is (id \t ep_no)
+# get the available episode list from AniList. Airing series may not publish
+# a total episode count; nextAiringEpisode then identifies the released count.
 yomi_episodes() {
-    _mal_id="$(printf "%s" "$1" | sed -nE 's|.*-([0-9]+)$|\1|p')"
-    _payload='{"query":"query ($id: Int) { Media(id: $id, type: ANIME) { episodes } }","variables":{"id":'"$_mal_id"'}}'
+    _anilist_id="$(printf "%s" "$1" | sed -nE 's|.*-([0-9]+)$|\1|p')"
+    _payload='{"query":"query ($id: Int) { Media(id: $id, type: ANIME) { episodes nextAiringEpisode { episode } } }","variables":{"id":'"$_anilist_id"'}}'
     _response="$($curl_exe -sL -A "$agent" -e "$base_api/" -H 'Origin: https://yomi.to' -H 'Content-Type: application/json' -H 'Accept: application/json' -d "$_payload" "$metadata_api")" ||
         die "Connection error: could not fetch $metadata_api"
     _count="$(printf "%s" "$_response" | jq -r '.data.Media.episodes // 0')"
     case "$_count" in
-        '' | 0 | null) return 1 ;;
+        '' | 0 | null)
+            _next_episode="$(printf "%s" "$_response" | jq -r '.data.Media.nextAiringEpisode.episode // 0')"
+            case "$_next_episode" in
+                '' | 0 | null | *[!0-9]*) return 1 ;;
+                *) _count=$((_next_episode - 1)) ;;
+            esac
+            ;;
         *[!0-9]*) return 1 ;;
     esac
+    [ "$_count" -gt 0 ] 2>/dev/null || return 1
     seq "$_count" | while read -r _ep; do
         printf "%s\t%s\n" "$1" "$_ep"
     done

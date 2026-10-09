@@ -68,6 +68,8 @@ Return after the player exits and use its exit code. Useful for non-interactive 
 After playback, the episode menu provides next, replay, previous, episode selection, quality selection, subtitle selection, and quit.
 .PP
 Navigation actions are queued until the current player exits. Subtitle selection offers available tracks and an off option. Subtitles start enabled and prefer English; the selected state is saved in the history directory.
+.PP
+For airing series whose total episode count is not published by AniList, the currently released episodes are derived from the next scheduled episode.
 .SH ENVIRONMENT
 .TP
 \fBYOMI_CLI_MODE\fR
